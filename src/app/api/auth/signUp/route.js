@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connection } from '../../../../libs/mysql.js';
-//import crypto from 'crypto';
+import crypto from 'crypto';
+
 //import { connectWallet } from '@/utils/smart.js'; // Importamos la función para conectar la wallet
 
 export async function POST(req) {
