@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  padding: 0;
+}
+
+
+/* Marketplace */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Marketplace */
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Landing page */
+
+
+.custom-gradient {
+  background: linear-gradient(to bottom, rgb(243, 244, 246) 0%, rgba(243, 244, 246, 0.9) 2%, rgba(243, 244, 246, 0.8) 5%, rgba(243, 244, 246, 0.5) 10%, rgba(204, 237, 237, 0.2) 20%, rgba(204, 237, 237, 0.2) 70%, rgba(195, 220, 220, 0.4) 85%, rgba(243, 244, 246, 0.6) 90%, rgba(243, 244, 246, 1) 100%);
+}
+
+.custom-dark-gradient {
+  background: linear-gradient(to bottom, rgb(39, 39, 39) 0%, rgba(39, 39, 39, 0.9) 2%, rgba(39, 39, 39, 0.8) 5%, rgba(39, 39, 39, 0.5) 10%, rgba(39, 39, 39, 0.2) 20%, rgba(39, 39, 39, 0.7) 70%, rgba(39, 39, 39, 0.8) 85%, rgba(39, 39, 39, 0.9) 90%, rgba(39, 39, 39, 1) 100%);
+}
+
+.landingFirstSection {
+  background-color: rgb(243, 244, 246);
+}
+
+.secondLandingFirstSection {
+  background-color: rgb(39, 39, 39);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #141313;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #2dbdca;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+
+.containerDivChangeColor .divChangeColor span.changeColor {
+  color: #23252a;
+  transition: color 0.7s;
+}
+
+.containerDivChangeColor .divChangeColor p {
+  color: #292a2c;
+  transition: color 0.7s;
+}
+
+.containerDivChangeColor:hover .divChangeColor span.changeColor {
+  color: #058a96;
+  transition: color 1s;
+}
+
+.containerDivChangeColor:hover .divChangeColor p {
+  color: #6b7280;
+  transition: color 1s;
+}
+
+
+/* Landing page */
+
+
+
+/* Integrantes */
+
+.glow-effect {
+  position: relative;
+  z-index: 0;
+}
+
+.glow-effect::before {
+  content: '';
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  bottom: -0.25rem;
+  left: -0.25rem;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+      #38BDF8 0%,
+      #262628 25%,
+      #18181B 50%,
+      #242424 75%);
+  border-radius: inherit;
+  /* Ajusta para que el radio de la frontera sea el mismo que el del contenedor */
+  filter: blur(8px);
+}
+
+
+/* Integrantes */
