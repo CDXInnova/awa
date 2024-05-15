@@ -12,7 +12,8 @@ const AuthLayout = ({ children }) => {
         <div className="md:flex hidden flex-1"></div>
         <div className="md:flex hidden items-center">
           <div className="flex gap-x-2 items-center">
-            <Image src="/images/logoHero.png" className="w-[3rem] h-[3rem] drop-shadow-lg" alt="panda_logo" />
+            <Image src="/images/logoHero.png" className="w-[3rem] h-[3rem] drop-shadow-lg" alt="panda_logo" width={500}
+              height={500} />
             <p className="font-bold drop-shadow-xl tracking-wider text-[22px] text-white">INAWAY</p>
           </div>
         </div>
@@ -26,7 +27,7 @@ const AuthLayout = ({ children }) => {
             pathname !== "/auth/signup" && <Link href="/auth/signup" className='px-5 py-1 font-semibold border-[2px] rounded-lg text-white border-sky-500 bg-sky-500 text-[18px] hover:bg-sky-300 hover:border-sky-300 hover:text-zinc-950 transition delay-50'>
               Regístrate
             </Link>
-          } 
+          }
         </div>
       </nav>
       {children}

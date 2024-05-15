@@ -1,52 +1,38 @@
-import { NextResponse } from 'next/server';
+import { NextApiResponse } from 'next';
 import { connection } from '../../../../libs/mysql.js';
 import crypto from 'crypto';
 
-export async function POST(req) {
+async function login(req, res) {
     if (req.method !== 'POST') {
-        return new NextResponse('Method not allowed', { status: 405 });
+        return res.status(405).json({ message: 'Method not allowed' });
     }
 
     try {
-        const { username, password } = await req.json();
+        const { usuario, contrasena } = req.body;
 
-        if (!username || !password) {
-            return new NextResponse(JSON.stringify({
-                message: "Username and password are required"
-            }), { status: 400 });
+        if (!usuario || !contrasena) {
+            return res.status(400).json({ message: "Username and password are required" });
         }
 
-        const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
+        const hashedPassword = crypto.createHash('sha256').update(contrasena).digest('hex');
+        const query = `SELECT * FROM register_user WHERE usuario = ? AND contrasena = ?`;
 
-        const query = `SELECT * FROM register_user WHERE username = ? AND contrasena = ?`;
-
-        return new Promise((resolve, reject) => {
-            connection.query(query, [username, hashedPassword], (err, results) => {
-                if (err) {
-                    console.error('Error:', err);
-                    resolve(new NextResponse(JSON.stringify({
-                        message: 'Internal Server Error',
-                        error: err.message
-                    }), { status: 500 }));
-                } else if (results.length === 0) {
-                    resolve(new NextResponse(JSON.stringify({
-                        message: 'Invalid credentials'
-                    }), { status: 401 }));
-                } else {
-                    const user = results[0];
-                    resolve(new NextResponse(JSON.stringify({
-                        message: 'User authenticated',
-                        user
-                    }), { status: 200 }));
-                }
-            });
+        connection.query(query, [usuario, hashedPassword], (err, results) => {
+            if (err) {
+                console.error('Error:', err);
+                return res.status(500).json({ message: 'Internal Server Error', error: err.message });
+            } else if (results.length === 0) {
+                return res.status(401).json({ message: 'Invalid credentials' });
+            } else {
+                const user = results[0];
+                return res.status(200).json({ message: 'User authenticated', user });
+            }
         });
 
     } catch (error) {
         console.error('Error:', error);
-        return new NextResponse(JSON.stringify({
-            message: 'Internal Server Error',
-            error: error.message
-        }), { status: 500 });
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 }
+
+export default login;

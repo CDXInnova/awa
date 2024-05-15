@@ -1,66 +1,47 @@
-import { NextResponse } from "next/server";
+import { NextApiResponse } from 'next';
 import { connection } from '../../../../libs/mysql.js';
 import crypto from 'crypto';
 
-//import { connectWallet } from '@/utils/smart.js'; // Importamos la función para conectar la wallet
-
-export async function POST(req) {
+async function signup(req, res) {
     if (req.method !== 'POST') {
-        return new NextResponse('Method not allowed', { status: 405 });
+        return res.status(405).json({ message: 'Method not allowed' });
     }
 
     try {
-        const {
-            email,
-            password,
-            name,
-            apellidos,
-            username,
-            patrocinador
-        } = await req.json();
+        const { email, password, name, apellidos, username, patrocinador } = req.body;
 
         if (!email || !password || password.length < 6 || !name || !apellidos || !username || !patrocinador) {
-            return new NextResponse(JSON.stringify({
-                message: "All fields are required and password must be at least 6 characters long"
-            }), { status: 400 });
+            const missingFields = [
+                !email && 'email',
+                !password && 'password',
+                password.length < 6 && 'password (min 6 characters)',
+                !name && 'name',
+                !apellidos && 'apellidos',
+                !username && 'username',
+                !patrocinador && 'patrocinador',
+            ].filter(Boolean).join(', ');
+
+            return res.status(400).json({ message: `The following fields are required: ${missingFields}` });
         }
 
-        // Encriptar la contraseña con sha1
-        const hashedPassword = crypto.createHash('sha1').update(password).digest('hex');
-
-        // Aquí puedes conectar la wallet favorita antes de continuar
-        // Asegúrate de manejar esto de manera adecuada en tu entorno de desarrollo
-        const wallet = ''; // Puedes establecer un valor predeterminado o manejar esto según tus necesidades
-
-        // Obtener la fecha actual para la fecha de inscripción
-        const fechaInscripcion = new Date().toISOString().slice(0, 10);
-
-        // Consulta SQL para insertar un nuevo usuario
+        const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
         const sql = `
-            INSERT INTO register_user (nombres, apellidos, username, contrasena, patrocinador, fecha_inscripcion, wallet_favorita)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO register_user (nombres, apellidos, usuario, contrasena, patrocinador)
+            VALUES (?, ?, ?, ?, ?)
         `;
 
-        // Ejecutar la consulta SQL
-        connection.query(sql, [name, apellidos, username, hashedPassword, patrocinador, fechaInscripcion, wallet], (err, results) => {
+        connection.query(sql, [name, apellidos, username, hashedPassword, patrocinador], (err, results) => {
             if (err) {
                 console.error('Error:', err);
-                return new NextResponse(JSON.stringify({
-                    message: 'Internal Server Error',
-                    error: err.message
-                }), { status: 500 });
+                return res.status(500).json({ message: 'Internal Server Error', error: err.message });
             }
-            // Si la inserción es exitosa, devolvemos una respuesta satisfactoria
-            return new NextResponse(JSON.stringify({
-                message: "User registered successfully"
-            }), { status: 201 });
+            return res.status(201).json({ message: "User registered successfully" });
         });
 
     } catch (error) {
         console.error('Error:', error);
-        return new NextResponse(JSON.stringify({
-            message: 'Internal Server Error',
-            error: error.message
-        }), { status: 500 });
+        return res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 }
+
+export default signup;

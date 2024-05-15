@@ -1,40 +1,65 @@
 import mysql from 'mysql';
+import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 
-// Configuración de la conexión a la base de datos
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'root',
-  database: 'inaway_system'
+  password: '',
+  database: 'acciones_m3'
 });
 
-// Conectar a la base de datos
 connection.connect(err => {
   if (err) {
     console.error('Error de conexión a la base de datos:', err);
-    return;
+    throw new Error('Error de conexión a la base de datos');
   }
   console.log('Conexión a la base de datos MySQL establecida.');
 });
 
-// Función para buscar un usuario por nombre de usuario y contraseña
-function findUserByUsernameAndPassword(username, password, callback) {
-  const query = `SELECT * FROM register_user WHERE username = ? AND contrasena = ?`;
-  connection.query(query, [username, password], (err, results) => {
-    if (err) {
-      callback(err, null);
-      return;
-    }
-    if (results.length === 0) {
-      // No se encontró ningún usuario con las credenciales proporcionadas
-      callback(null, null);
-      return;
-    }
-    // Se encontró un usuario con las credenciales proporcionadas
-    const user = results[0];
-    callback(null, user);
-  });
-}
+export async function POST(req) {
+  if (req.method !== 'POST') {
+    return new NextResponse('Method not allowed', { status: 405 });
+  }
 
-// Exportar la conexión y la función para su uso en otras partes de la aplicación
-export { connection, findUserByUsernameAndPassword };
+  try {
+    const { usuario, contrasena } = await req.json();
+    if (!usuario || !contrasena) {
+      return new NextResponse(JSON.stringify({
+        message: "Username and password are required"
+      }), { status: 400 });
+    }
+
+    const hashedPassword = crypto.createHash('sha1').update(contrasena).digest('hex');
+    const query = `SELECT * FROM register_user WHERE usuario = ? AND contrasena = ?`;
+
+    return new Promise((resolve, reject) => {
+      connection.query(query, [usuario, hashedPassword], (err, results) => {
+        if (err) {
+          console.error('Error:', err);
+          resolve(new NextResponse(JSON.stringify({
+            message: 'Internal Server Error',
+            error: err.message
+          }), { status: 500 }));
+        } else if (results.length === 0) {
+          resolve(new NextResponse(JSON.stringify({
+            message: 'Invalid credentials'
+          }), { status: 401 }));
+        } else {
+          const user = results[0];
+          resolve(new NextResponse(JSON.stringify({
+            message: 'User authenticated',
+            user
+          }), { status: 200 }));
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('Error:', error);
+    return new NextResponse(JSON.stringify({
+      message: 'Internal Server Error',
+      error: error.message
+    }), { status: 500 });
+  }
+}
